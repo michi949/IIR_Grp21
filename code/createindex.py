@@ -3,7 +3,10 @@ This file contains your code to create the inverted index. Besides implementing 
 """
 
 
+
 def text2tokens(text):
+
+
     """
     :param text: a text string
     :return: a tokenized string with preprocessing (e.g. stemming, stopword removal, ...) applied
