@@ -5,7 +5,7 @@ class DictionaryEntry(object):
     token: str
     posting: [int]
 
-    def __init__(self, token: str, dicID: int):
+    def __init__(self, token: str, dicID):
         self.token = token
         self.posting = []
         self.posting.append(dicID)
@@ -37,9 +37,6 @@ class InvertedIndex(object):
 
     def sortIndex(self):
         self.dictionary = sorted(self.dictionary, key=lambda x: x.token)
-
-    def checkDoubleToken(self, token: str):
-        pass
 
     def findIndexOfEntry(self, token: str):
         for i, entry in enumerate(self.dictionary):

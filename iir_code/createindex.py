@@ -5,7 +5,7 @@ from iir_code.inverted_index import InvertedIndex
 from iir_code.services.file_manager import FileManager
 import re
 
-fileManager = FileManager("../dataset/wikipedia articles/")
+fileManager = FileManager()
 invertedIndex = InvertedIndex()
 
 
@@ -21,12 +21,14 @@ def readAllFiles():
         processFile(content, docID)
 
 
+# TODO: Is it one string or a array of strings?
 def processFile(content: [str], docID: int):
     for text in content:
-        token = text2tokens(text) # TODO: Is it one string or a array of strings?
+        token = text2tokens(text)
         invertedIndex.append(token, docID)
 
 
+# TODO: Do stemming, stopword removal
 def text2tokens(text: str):
     text = text.lower()
     splitedText = re.split(" |\n", text)
