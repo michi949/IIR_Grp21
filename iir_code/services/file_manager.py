@@ -4,8 +4,15 @@ class FileManager:
     _filePath = "../../dataset/wikipedia articles/"
     _currentFileIndex = 0
 
-    def __init__(self):
+    def __int__(self):
         self._currentFileIndex = 0
+
+    def __init__(self, filePath: str):
+        self._currentFileIndex = 0
+        self._filePath = filePath
+
+    def getFilesCount(self):
+        return 553
 
     def readNextFile(self):
         self._currentFileIndex += 1
