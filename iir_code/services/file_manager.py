@@ -1,6 +1,7 @@
-from bs4 import BeautifulSoup
-from iir_code.inverted_index import InvertedIndex, DictionaryEntry
 import json
+from bs4 import BeautifulSoup
+from iir_code.inverted_index import InvertedIndex
+
 
 class FileManager:
     _article_file_path = "../dataset/wikipedia articles/"
@@ -63,6 +64,6 @@ class FileManager:
             for key in data:
                 print(key)
                 print(data[key])
-                invertedIndex.dictionary.append(DictionaryEntry(key, data[key]))
+                inverted_index.append(key, data[key])
 
             return inverted_index
