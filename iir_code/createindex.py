@@ -9,49 +9,53 @@ from nltk.corpus import stopwords
 import string
 import unicodedata
 
-
-fileManager = FileManager()
-invertedIndex = InvertedIndex()
+file_manager = FileManager()
+inverted_index = InvertedIndex()
 
 # stop words set
 sw_set = set(stopwords.words('english'))
-sw_set.update({''}) # add as stop words to remove empty strings
+sw_set.update({''})  # add as stop words to remove empty strings
 
 # punctuation
 regular_punct = string.punctuation
 extra_punct = [',', '.', '"', ':', ')', '(', '!', '?', '|', ';', "'", '$', '&',
-    '/', '[', ']', '>', '%', '=', '#', '*', '+', '\\', '•',  '~', '@', '£',
-    '·', '_', '—', '{', '}', '©', '^', '®', '`',  '<', '→', '°', '€', '™', '›',
-    '♥', '←', '×', '§', '″', '′', 'Â', '█', '½', 'à', '…', '“', '★', '”',
-    '–', '●', 'â', '►', '−', '¢', '²', '¬', '░', '¶', '↑', '±', '¿', '▾',
-    '═', '¦', '║', '―', '¥', '▓', '—', '‹', '─', '▒', '：', '¼', '⊕', '▼',
-    '▪', '†', '■', '’', '▀', '¨', '▄', '♫', '☆', 'é', '¯', '♦', '¤', '▲',
-    'è', '¸', '¾', 'Ã', '⋅', '‘', '∞', '∙', '）', '↓', '、', '│', '（', '»',
-    '，', '♪', '╩', '╚', '³', '・', '╦', '╣', '╔', '╗', '▬', '❤', 'ï', 'Ø',
-    '¹', '≤', '‡', '√', '«', '»', '•', '´', 'º', '¾', '¡', '§', '£', '₤', 
-    '€', '·']
+               '/', '[', ']', '>', '%', '=', '#', '*', '+', '\\', '•', '~', '@', '£',
+               '·', '_', '—', '{', '}', '©', '^', '®', '`', '<', '→', '°', '€', '™', '›',
+               '♥', '←', '×', '§', '″', '′', 'Â', '█', '½', 'à', '…', '“', '★', '”',
+               '–', '●', 'â', '►', '−', '¢', '²', '¬', '░', '¶', '↑', '±', '¿', '▾',
+               '═', '¦', '║', '―', '¥', '▓', '—', '‹', '─', '▒', '：', '¼', '⊕', '▼',
+               '▪', '†', '■', '’', '▀', '¨', '▄', '♫', '☆', 'é', '¯', '♦', '¤', '▲',
+               'è', '¸', '¾', 'Ã', '⋅', '‘', '∞', '∙', '）', '↓', '、', '│', '（', '»',
+               '，', '♪', '╩', '╚', '³', '・', '╦', '╣', '╔', '╗', '▬', '❤', 'ï', 'Ø',
+               '¹', '≤', '‡', '√', '«', '»', '•', '´', 'º', '¾', '¡', '§', '£', '₤',
+               '€', '·']
 extra_punct = "".join(extra_punct)
 punctuation = regular_punct + extra_punct
 
 
-
 # cachedFiles: {int: [str]} = {}
 def main():
-    readAllFiles()
+    read_all_files()
 
 
-def readAllFiles():
-    for docID in range(fileManager.getXmlFilesCount()):
-        print("Read file: " + str(docID) + ".xml")
-        content = fileManager.readNextXmlFile()
-        processFile(content, docID)
+def read_all_files():
+    """Read all XML files stored in the '../dataset/wikipedia articles' directory."""
+    for doc_id in range(file_manager.get_xml_files_count()):
+        print("Read file: " + str(doc_id) + ".xml")
+        content = file_manager.read_next_xml_file()
+        process_file(content, doc_id)
 
 
-# TODO: Is it one string or a array of strings?
-def processFile(content: [str], docID: int):
+def process_file(content: [str], doc_id: int):
+    """
+    Reads in content, converts it to tokens and writes them to the index.
+    :param content: The contents of the <bdy> tag from the XML file
+    :param doc_id: The id of the XML file
+    """
     for text in content:
         token = text2tokens(text)
-        invertedIndex.append(token, docID)
+        inverted_index.append_list(token, doc_id)
+
 
 # TODO: Should we remove accents (eg.: é->e)?
 def text2tokens(text: str):
@@ -59,33 +63,34 @@ def text2tokens(text: str):
     :param text: a text string
     :return: a tokenized string with preprocessing (e.g. stemming, stopword removal, ...) applied
     """
-    
+
     # lowercase
     text = text.lower()
-    
+
     # remove all http addresses and www websites
     text = re.sub("http[^\\s]+", "", text)
     text = re.sub("www[^\\s]+", "", text)
-    
+
     # remove all \xa chars
     text = unicodedata.normalize("NFKD", text)
-    
-    #handle multi-blanks
+
+    # handle multi-blanks
     text = re.sub(' +', ' ', text)
-           
+
     # remove punctuation
     text = text.translate(str.maketrans('', '', punctuation))
         
     # tokenization
-    splitedText = re.split(" |\n", text)
+    splitted_text = re.split(" |\n", text)
 
     # stemming 
     PS = PorterStemmer()
-    splitedText = [PS.stem(token) for token in splitedText]
+    splitted_text = [PS.stem(token) for token in splitted_text]
 
     # stop words removal
-    splitedText = [token for token in splitedText if token not in sw_set]
+    splitted_text = [token for token in splitted_text if token not in sw_set]
 
-    return splitedText
+    return splitted_text
+
 
 main()
