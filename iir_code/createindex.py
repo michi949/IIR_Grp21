@@ -79,7 +79,7 @@ def text2tokens(text: str):
 
     # remove punctuation
     text = text.translate(str.maketrans('', '', punctuation))
-        
+
     # tokenization
     splitted_text = re.split(" |\n", text)
 
