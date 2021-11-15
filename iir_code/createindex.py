@@ -55,9 +55,24 @@ def process_file(content: [str], doc_id: int):
     for text in content:
         token = text2tokens(text)
         inverted_index.append_list(token, doc_id)
+        
+
+def remove_accents(text):
+    """
+    Substitutes accents with non-accents letters in text.
+    : param text: The text to be analized
+    """
+    text = re.sub(u"[àáâãäå]", 'a', text)
+    text = re.sub(u"[èéêë]", 'e', text)
+    text = re.sub(u"[ìíîï]", 'i', text)
+    text = re.sub(u"[òóôõö]", 'o', text)
+    text = re.sub(u"[ùúûü]", 'u', text)
+    text = re.sub(u"[ýÿ]", 'y', text)
+    text = re.sub(u"[ß]", 'ss', text)
+    text = re.sub(u"[ñ]", 'n', text)  
+    return text 
 
 
-# TODO: Should we remove accents (eg.: é->e)?
 def text2tokens(text: str):
     """
     :param text: a text string
@@ -70,6 +85,9 @@ def text2tokens(text: str):
     # remove all http addresses and www websites
     text = re.sub("http[^\\s]+", "", text)
     text = re.sub("www[^\\s]+", "", text)
+    
+    # remove accents
+    text = remove_accents(text)
 
     # remove all \xa chars
     text = unicodedata.normalize("NFKD", text)
