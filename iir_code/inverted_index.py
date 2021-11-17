@@ -25,6 +25,19 @@ class InvertedIndex(object):
         for token in tokens:
             self.append(token, doc_id)
 
+    def append_dict(self, tokens: dict, doc_id: int):
+        """
+        Set the frequency of a token occurring in a specific article (document).
+        :param tokens: Dictionary with all tokens and their frequency in the article with doc_id
+        :param doc_id: ID of the article
+        """
+        for token in tokens:
+            if token in self.dictionary:
+                # Set the frequency of token occurring in article with doc_id
+                self.dictionary[token][doc_id] = tokens[token]
+            else:
+                self.dictionary[token] = {doc_id: 1}
+
     def sort_index(self):
         """Sort the index by tokens in-place."""
         sorted_dictionary = {}

@@ -8,6 +8,8 @@ from nltk.stem import PorterStemmer
 from nltk.corpus import stopwords
 import string
 import unicodedata
+from collections import Counter
+import pickle
 
 file_manager = FileManager()
 inverted_index = InvertedIndex()
@@ -36,25 +38,31 @@ punctuation = regular_punct + extra_punct
 # cachedFiles: {int: [str]} = {}
 def main():
     read_all_files()
+    print('Dumping index to disk...')
+    with open('index.pickle', 'wb') as handle:
+        pickle.dump(inverted_index.dictionary, handle, protocol=pickle.HIGHEST_PROTOCOL)
+    # file_manager.save_index_to_json(inverted_index)
 
 
 def read_all_files():
     """Read all XML files stored in the '../dataset/wikipedia articles' directory."""
     for doc_id in range(file_manager.get_xml_files_count()):
         print("Read file: " + str(doc_id) + ".xml")
-        content = file_manager.read_next_xml_file()
-        process_file(content, doc_id)
+        id_body = file_manager.read_next_xml_file()
+        for article_id, body in id_body:
+            process_article(body, int(article_id))
 
 
-def process_file(content: [str], doc_id: int):
+def process_article(content: [str], doc_id: int):
     """
     Reads in content, converts it to tokens and writes them to the index.
     :param content: The contents of the <bdy> tag from the XML file
     :param doc_id: The id of the XML file
     """
-    for text in content:
-        token = text2tokens(text)
-        inverted_index.append_list(token, doc_id)
+    tokens = text2tokens(content)
+    # Construct a dict with tokens and their number of occurrences
+    token_frequency = dict(Counter(tokens))
+    inverted_index.append_dict(token_frequency, doc_id)
         
 
 def remove_accents(text):
