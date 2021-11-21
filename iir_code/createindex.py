@@ -102,14 +102,14 @@ def text2tokens(text: str):
     # remove punctuation
     text = text.translate(str.maketrans('', '', punctuation))
 
-    # TODO Add num2word, 100 to one hundred
-
     # tokenization
     splitted_text = re.split(" |\n", text)
 
     # stemming 
     PS = PorterStemmer()
     splitted_text = [PS.stem(token) for token in splitted_text]
+
+    # TODO Add num2word, 100 to one hundred
 
     # stop words removal
     splitted_text = [token for token in splitted_text if token not in sw_set]
