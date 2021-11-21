@@ -1,7 +1,7 @@
 """
 This file contains your iir_code to create the inverted index. Besides implementing and using the predefined tokenization function (text2tokens), there are no restrictions in how you organize this file.
 """
-from iir_code.inverted_index import InvertedIndex
+from iir_code.data.inverted_index import InvertedIndex
 from iir_code.services.file_manager import FileManager
 import re
 from nltk.stem import PorterStemmer
@@ -9,7 +9,6 @@ from nltk.corpus import stopwords
 import string
 import unicodedata
 from collections import Counter
-import pickle
 
 file_manager = FileManager()
 inverted_index = InvertedIndex()
@@ -102,6 +101,8 @@ def text2tokens(text: str):
 
     # remove punctuation
     text = text.translate(str.maketrans('', '', punctuation))
+
+    # TODO Add num2word, 100 to one hundred
 
     # tokenization
     splitted_text = re.split(" |\n", text)

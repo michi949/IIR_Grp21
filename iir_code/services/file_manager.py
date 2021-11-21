@@ -1,13 +1,14 @@
-import json
 import pickle
 
 from bs4 import BeautifulSoup
-from iir_code.inverted_index import InvertedIndex
+from iir_code.data.inverted_index import InvertedIndex
+from iir_code.data.topic import Topic
 
 
 class FileManager:
     _article_file_path = "../dataset/wikipedia articles/"
-    _saved_index_path = "../"
+    _topics_file_path = "../dataset/topics.xml"
+    _saved_index_path = "index.pickle"
     _current_xml_file_index = 0
     _xml_files_count = 553
 
@@ -42,21 +43,23 @@ class FileManager:
 
         return id_body_list
 
-    def save_index_to_json(self, inverted_index: InvertedIndex):
-        """
-        TODO: Remove because of less performance
-        Store an index as a json file.
-        :param inverted_index: The index to be saved
-        """
-        """
-        json_dic: {str: [int]} = {}
+    def read_topics_file(self):
+        with open(self._topics_file_path, 'r') as f:
+            data_stream = f.read()
 
-        for token in inverted_index.dictionary.keys():
-            json_dic[token] = inverted_index.dictionary.get(token).tolist()
+        data = BeautifulSoup(data_stream, 'lxml')
+        topic_elements = data.findAll("topic")
 
-        """
-        with open(self._saved_index_path + "inverted_index.json", "w") as outfile:
-            json.dump(inverted_index.dictionary, outfile)
+        topics = []
+
+        for topic in topic_elements:
+            id = topic.get('id')
+            title = topic.select('title')[0].contents[0]
+            description = topic.select('description')[0].contents[0]
+            topics.append(Topic(id, title, description))
+
+        return topics
+
 
     def save_index_as_pickle(self, inverted_index: InvertedIndex):
         """
@@ -65,21 +68,11 @@ class FileManager:
         :return:
         """
         print('Dumping index to disk...')
-        with open('index.pickle', 'wb') as handle:
+        with open(self._saved_index_path, 'wb') as handle:
             pickle.dump(inverted_index.dictionary, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
-    def load_index_from_json(self):
-        """
-        Load an index from a json file.
-        :return: The inverted index
-        """
-        with open(self._saved_index_path + "inverted_index.json", "r") as f:
-            data = json.load(f)
+    def load_index_from_pickle(self):
+        print('Loading index from disk')
 
-            inverted_index = InvertedIndex()
-            for key in data:
-                print(key)
-                print(data[key])
-                inverted_index.append(key, data[key])
-
-            return inverted_index
+        with open(self._saved_index_path, 'rb') as handle:
+            return pickle.load(handle)
