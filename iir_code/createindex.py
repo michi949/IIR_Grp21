@@ -38,10 +38,7 @@ punctuation = regular_punct + extra_punct
 # cachedFiles: {int: [str]} = {}
 def main():
     read_all_files()
-    print('Dumping index to disk...')
-    with open('index.pickle', 'wb') as handle:
-        pickle.dump(inverted_index.dictionary, handle, protocol=pickle.HIGHEST_PROTOCOL)
-    # file_manager.save_index_to_json(inverted_index)
+    file_manager.save_index_as_pickle(inverted_index)
 
 
 def read_all_files():

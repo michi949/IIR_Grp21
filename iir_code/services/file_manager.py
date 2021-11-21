@@ -1,4 +1,6 @@
 import json
+import pickle
+
 from bs4 import BeautifulSoup
 from iir_code.inverted_index import InvertedIndex
 
@@ -38,12 +40,11 @@ class FileManager:
         # Construct a list of tuples [(id, body)] with each article id and corresponding body
         id_body_list = tuple(zip(ids_cleaned, bodies_cleaned))
 
-        # TODO [MiRe] Add description headers
-
         return id_body_list
 
     def save_index_to_json(self, inverted_index: InvertedIndex):
         """
+        TODO: Remove because of less performance
         Store an index as a json file.
         :param inverted_index: The index to be saved
         """
@@ -56,6 +57,16 @@ class FileManager:
         """
         with open(self._saved_index_path + "inverted_index.json", "w") as outfile:
             json.dump(inverted_index.dictionary, outfile)
+
+    def save_index_as_pickle(self, inverted_index: InvertedIndex):
+        """
+        Saves the index as pickle file
+        :param inverted_index:
+        :return:
+        """
+        print('Dumping index to disk...')
+        with open('index.pickle', 'wb') as handle:
+            pickle.dump(inverted_index.dictionary, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
     def load_index_from_json(self):
         """
