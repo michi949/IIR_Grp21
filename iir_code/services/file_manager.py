@@ -74,7 +74,7 @@ class FileManager:
 
     def save_qrels_file(self, qrels_lines, function_type):
         print('Save result as qrels file')
-        base_path = self._saved_qrels_files_path + function_type + "_file"
+        base_path = self._saved_qrels_files_path + function_type
         with open(base_path + ".qrels", 'wb') as handle:
             handle.write('\n'.join(qrels_lines).encode('utf-8'))
 

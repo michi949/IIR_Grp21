@@ -1,6 +1,8 @@
 """
 This file contains your code to generate the evaluation files that are input to the trec_eval algorithm.
 """
+import subprocess
+
 from iir_code.exploration_mode import tf_idf, bm25
 from iir_code.services.file_manager import FileManager
 
@@ -35,10 +37,15 @@ def perform_search(input_str: str, function_type: str):
 def process_trec_eval(qrel_lines, function_type: str):
     """
     Performs the trec evaluation
+    Install trec_eval first: https://github.com/usnistgov/trec_eval or brew install trec_eval
     Ideal result should around 0.17 for TF-IDF and 0.23 for BMF
     :return:
     """
     file_manager.save_qrels_file(qrel_lines, function_type)
+
+    base_path = "../dataset/eval.qrels"  # + function_type
+    goal_path = "../retrieval_results/" + function_type.lower() + "_title_description.txt"
+    subprocess.run(["trec_eval", "-m", "map", "-m", "ndcg_cut.10", "-m", "P.10", "-m", "recall.10", base_path, goal_path])
 
 
 def process_topics_query(topics: dict, function_type: str):
