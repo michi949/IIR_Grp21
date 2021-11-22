@@ -1,3 +1,4 @@
+import os
 import pickle
 
 from bs4 import BeautifulSoup
@@ -7,7 +8,8 @@ from iir_code.data.inverted_index import InvertedIndex
 class FileManager:
     _article_file_path = "../dataset/wikipedia articles/"
     _topics_file_path = "../dataset/topics.xml"
-    _saved_index_path = "index.pickle"
+    _saved_index_path = "../dataset/index.pickle"
+    _saved_qrels_files_path = "../dataset/qrels/"
     _current_xml_file_index = 0
     _xml_files_count = 553
 
@@ -69,3 +71,14 @@ class FileManager:
 
         with open(self._saved_index_path, 'rb') as handle:
             return pickle.load(handle)
+
+    def save_qrels_file(self, qrels_lines, function_type):
+        print('Save result as qrels file')
+        base_path = self._saved_qrels_files_path + function_type + "_file"
+        with open(base_path + ".txt", 'wb') as handle:
+            for line in qrels_lines:
+                print(line)
+                handle.writelines(line + "\n")
+            #handle.write('\n'.join(qrels_lines))
+
+        os.rename(base_path + ".txt", base_path + ".qrels")

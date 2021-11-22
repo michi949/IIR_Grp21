@@ -45,4 +45,4 @@ def bm25(input_str: str):
     index = read_index_from_file()
 
 
-main()
+# main()
