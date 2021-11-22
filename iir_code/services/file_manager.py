@@ -2,7 +2,6 @@ import pickle
 
 from bs4 import BeautifulSoup
 from iir_code.data.inverted_index import InvertedIndex
-from iir_code.data.topic import Topic
 
 
 class FileManager:
@@ -50,13 +49,13 @@ class FileManager:
         data = BeautifulSoup(data_stream, 'lxml')
         topic_elements = data.findAll("topic")
 
-        topics = []
+        topics = {}
 
         for topic in topic_elements:
             id = topic.get('id')
             title = topic.select('title')[0].contents[0]
             description = topic.select('description')[0].contents[0]
-            topics.append(Topic(id, title, description))
+            topics.update({id: {'title': title, 'description': description}})
 
         return topics
 
