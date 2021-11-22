@@ -75,10 +75,7 @@ class FileManager:
     def save_qrels_file(self, qrels_lines, function_type):
         print('Save result as qrels file')
         base_path = self._saved_qrels_files_path + function_type + "_file"
-        with open(base_path + ".txt", 'wb') as handle:
-            for line in qrels_lines:
-                print(line)
-                handle.writelines(line + "\n")
-            #handle.write('\n'.join(qrels_lines))
+        with open(base_path + ".qrels", 'wb') as handle:
+            handle.write('\n'.join(qrels_lines).encode('utf-8'))
 
-        os.rename(base_path + ".txt", base_path + ".qrels")
+        # os.rename(base_path + ".txt", base_path + ".qrels")  # Can take some seconds until file is available

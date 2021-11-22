@@ -4,7 +4,6 @@ This file contains your code to generate the evaluation files that are input to 
 from iir_code.exploration_mode import tf_idf, bm25
 from iir_code.services.file_manager import FileManager
 
-run_name = "007"
 file_manager = FileManager()
 
 
@@ -36,6 +35,7 @@ def perform_search(input_str: str, function_type: str):
 def process_trec_eval(qrel_lines, function_type: str):
     """
     Performs the trec evaluation
+    Ideal result should around 0.17 for TF-IDF and 0.23 for BMF
     :return:
     """
     file_manager.save_qrels_file(qrel_lines, function_type)
@@ -65,4 +65,4 @@ def process_topics_query(topics: dict, function_type: str):
 process_trec_eval(["2010003 Q0 19243417 1",
                    "2010003 Q0 3256433 1",
                    "2010003 Q0 275014 1",
-                   "2010003 Q0 298021 0"], "BM25")
+                   "2010003 Q0 298021 0"], "TD-IFD")
