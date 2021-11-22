@@ -115,6 +115,3 @@ def text2tokens(text: str):
     splitted_text = [token for token in splitted_text if token not in sw_set]
 
     return splitted_text
-
-
-main()
