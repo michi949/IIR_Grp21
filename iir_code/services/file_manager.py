@@ -60,13 +60,7 @@ class FileManager:
 
         return topics
 
-
     def save_index_as_pickle(self, inverted_index: InvertedIndex):
-        """
-        Saves the index as pickle file
-        :param inverted_index:
-        :return:
-        """
         print('Dumping index to disk...')
         with open(self._saved_index_path, 'wb') as handle:
             pickle.dump(inverted_index.dictionary, handle, protocol=pickle.HIGHEST_PROTOCOL)
