@@ -1,4 +1,5 @@
-import json
+import pickle
+
 from bs4 import BeautifulSoup
 from iir_code.inverted_index import InvertedIndex
 
@@ -42,33 +43,39 @@ class FileManager:
 
         return id_body_list
 
-    def save_index_to_json(self, inverted_index: InvertedIndex):
+    def save_index_to_pickle(self, inverted_index: InvertedIndex):
         """
-        Store an index as a json file.
-        :param inverted_index: The index to be saved
+        Store an index as a pickle file in inverted_index.pickle.
+        :param inverted_index: The inverted index to save to disk
         """
-        """
-        json_dic: {str: [int]} = {}
+        with open(self._saved_index_path + 'inverted_index.pickle', 'wb') as handle:
+            pickle.dump([inverted_index.dictionary, inverted_index.ranking_dict], handle,
+                        protocol=pickle.HIGHEST_PROTOCOL)
 
-        for token in inverted_index.dictionary.keys():
-            json_dic[token] = inverted_index.dictionary.get(token).tolist()
-
+    def load_index_from_pickle(self) -> InvertedIndex:
         """
-        with open(self._saved_index_path + "inverted_index.json", "w") as outfile:
-            json.dump(inverted_index.dictionary, outfile)
-
-    def load_index_from_json(self):
+        Load an index from a pickle file.
+        return: The index loaded from disk
         """
-        Load an index from a json file.
-        :return: The inverted index
-        """
-        with open(self._saved_index_path + "inverted_index.json", "r") as f:
-            data = json.load(f)
-
+        with open(self._saved_index_path + 'inverted_index.pickle', 'rb') as handle:
+            index = pickle.load(handle)
             inverted_index = InvertedIndex()
-            for key in data:
-                print(key)
-                print(data[key])
-                inverted_index.append(key, data[key])
+            inverted_index.dictionary = index[0]
+            inverted_index.ranking_dict = index[1]
 
             return inverted_index
+
+    def get_text_from_doc_id(self, doc_id: int, filename: str) -> str:
+        """
+        Returns the text associated with an article id (doc_id).
+        :param doc_id: The document id to find the corresponding text of
+        :param filename: The filename of the file where the article is stored
+        :return: The contents of the <bdy> tag
+        """
+        with open(self._article_file_path + str(filename), 'r') as f:
+            data_stream = f.read()
+
+        data = BeautifulSoup(data_stream, 'lxml')
+        article_tag = data.find('id', text=doc_id)
+        text = article_tag.parent.parent.find('bdy').text
+        return text
