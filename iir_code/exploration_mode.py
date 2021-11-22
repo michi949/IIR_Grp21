@@ -89,6 +89,5 @@ def bm25(input_str: str, doc_id: int, index, k1=1.2, b=0.75):
             score_bm25 += np.log(N/df_t)*(((k1+1)*tf_td)/(k1*((1-b)+b*(L_d/L_ave))+tf_td))
     return score_bm25
 
-
-main()
+# main()
 

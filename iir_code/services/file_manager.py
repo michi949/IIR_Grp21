@@ -1,14 +1,15 @@
+import os
 import pickle
 
 from bs4 import BeautifulSoup
 from iir_code.data.inverted_index import InvertedIndex
-from iir_code.data.topic import Topic
 
 
 class FileManager:
     _article_file_path = "../dataset/wikipedia articles/"
     _topics_file_path = "../dataset/topics.xml"
-    _saved_index_path = "index.pickle"
+    _saved_index_path = "../dataset/index.pickle"
+    _saved_qrels_files_path = "../dataset/qrels/"
     _current_xml_file_index = 0
     _xml_files_count = 553
 
@@ -52,13 +53,13 @@ class FileManager:
         data = BeautifulSoup(data_stream, 'lxml')
         topic_elements = data.findAll("topic")
 
-        topics = []
+        topics = {}
 
         for topic in topic_elements:
             id = topic.get('id')
             title = topic.select('title')[0].contents[0]
             description = topic.select('description')[0].contents[0]
-            topics.append(Topic(id, title, description))
+            topics.update({id: {'title': title, 'description': description}})
 
         return topics
 
@@ -98,3 +99,12 @@ class FileManager:
         article_tag = data.find('id', text=doc_id)
         text = article_tag.parent.parent.find('bdy').text
         return text
+
+    def save_qrels_file(self, qrels_lines, function_type):
+        print('Save result as qrels file')
+        base_path = self._saved_qrels_files_path + function_type
+        with open(base_path + ".qrels", 'wb') as handle:
+            handle.write('\n'.join(qrels_lines).encode('utf-8'))
+
+        # os.rename(base_path + ".txt", base_path + ".qrels")  # Can take some seconds until file is available
+
