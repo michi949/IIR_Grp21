@@ -39,9 +39,7 @@ punctuation = regular_punct + extra_punct
 def main():
     read_all_files()
     print('Dumping index to disk...')
-    with open('index.pickle', 'wb') as handle:
-        pickle.dump(inverted_index.dictionary, handle, protocol=pickle.HIGHEST_PROTOCOL)
-    # file_manager.save_index_to_json(inverted_index)
+    file_manager.save_index_to_pickle(inverted_index)
 
 
 def read_all_files():
@@ -50,20 +48,21 @@ def read_all_files():
         print("Read file: " + str(doc_id) + ".xml")
         id_body = file_manager.read_next_xml_file()
         for article_id, body in id_body:
-            process_article(body, int(article_id))
+            process_article(body, int(article_id), str(file_manager._current_xml_file_index) + '.xml')
 
 
-def process_article(content: [str], doc_id: int):
+def process_article(content: [str], doc_id: int, filename: str):
     """
     Reads in content, converts it to tokens and writes them to the index.
     :param content: The contents of the <bdy> tag from the XML file
     :param doc_id: The id of the XML file
+    :param filename: The filename of the XML file the article belongs to
     """
     tokens = text2tokens(content)
     # Construct a dict with tokens and their number of occurrences
     token_frequency = dict(Counter(tokens))
-    inverted_index.append_dict(token_frequency, doc_id)
-        
+    inverted_index.append_dict(token_frequency, doc_id, len(tokens), filename)
+
 
 def remove_accents(text):
     """
@@ -77,8 +76,8 @@ def remove_accents(text):
     text = re.sub(u"[ùúûü]", 'u', text)
     text = re.sub(u"[ýÿ]", 'y', text)
     text = re.sub(u"[ß]", 'ss', text)
-    text = re.sub(u"[ñ]", 'n', text)  
-    return text 
+    text = re.sub(u"[ñ]", 'n', text)
+    return text
 
 
 def text2tokens(text: str):
@@ -93,7 +92,7 @@ def text2tokens(text: str):
     # remove all http addresses and www websites
     text = re.sub("http[^\\s]+", "", text)
     text = re.sub("www[^\\s]+", "", text)
-    
+
     # remove accents
     text = remove_accents(text)
 
