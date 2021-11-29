@@ -17,15 +17,6 @@ class InvertedIndex(object):
         else:
             self.dictionary.update({token: np.append(current_postingslist, doc_id)})
 
-    def append_list(self, tokens: [str], doc_id: int):
-        """
-        Append each token in tokens to the index and set the doc_id.
-        :param tokens: The list of tokens to add
-        :param doc_id: The document id
-        """
-        for token in tokens:
-            self.append(token, doc_id)
-
     def append_dict(self, tokens: dict, doc_id: int, length: int, filename: str):
         """
         Set the frequency of a token occurring in a specific article (document) and
