@@ -31,7 +31,7 @@ class InvertedIndex(object):
                 # Set the frequency of token occurring in article with doc_id
                 self.dictionary[token][doc_id] = tokens[token]
             else:
-                self.dictionary[token] = {doc_id: 1}
+                self.dictionary[token] = {doc_id: tokens[token]}
         self.ranking_dict[doc_id] = np.array([length, filename])
 
     def sort_index(self):
