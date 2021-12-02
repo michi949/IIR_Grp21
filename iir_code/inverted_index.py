@@ -17,22 +17,23 @@ class InvertedIndex(object):
         else:
             self.dictionary.update({token: np.append(current_postingslist, doc_id)})
 
-    def append_dict(self, tokens: dict, doc_id: int, length: int, filename: str):
+    def append_dict(self, tokens: dict, doc_id: int, length: int, file_number: int):
         """
         Set the frequency of a token occurring in a specific article (document) and
         record the length and filename of the article.
         :param tokens: Dictionary with all tokens and their frequency in the article with doc_id
         :param doc_id: ID of the article
         :param length: Length of the article in words/terms
-        :param filename: Filename of the file in which the article is stored
+        :param file_number: Number of the file in which the article is stored
         """
         for token in tokens:
             if token in self.dictionary:
                 # Set the frequency of token occurring in article with doc_id
-                self.dictionary[token][doc_id] = tokens[token]
+                self.dictionary[token] = np.append(self.dictionary[token],
+                                                   np.array([doc_id, tokens[token]], dtype=np.uint32))
             else:
-                self.dictionary[token] = {doc_id: tokens[token]}
-        self.ranking_dict[doc_id] = np.array([length, filename])
+                self.dictionary[token] = np.array([doc_id, tokens[token]], dtype=np.uint32)
+        self.ranking_dict[doc_id] = np.array([length, file_number], dtype=np.uint32)
 
     def sort_index(self):
         """Sort the index by tokens in-place."""

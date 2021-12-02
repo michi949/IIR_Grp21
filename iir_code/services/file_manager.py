@@ -75,14 +75,14 @@ class FileManager:
 
             return inverted_index
 
-    def get_text_from_doc_id(self, doc_id: int, filename: str) -> str:
+    def get_text_from_doc_id(self, doc_id: int, file_number: int) -> str:
         """
         Returns the text associated with an article id (doc_id).
         :param doc_id: The document id to find the corresponding text of
-        :param filename: The filename of the file where the article is stored
+        :param file_number: The number of the file where the article is stored
         :return: The contents of the <bdy> tag
         """
-        with open(self._article_file_path + str(filename), 'r') as f:
+        with open(self._article_file_path + str(file_number) + '.xml', 'r') as f:
             data_stream = f.read()
 
         data = BeautifulSoup(data_stream, 'lxml')

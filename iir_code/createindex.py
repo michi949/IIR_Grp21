@@ -48,20 +48,20 @@ def read_all_files():
         print("Read file: " + str(doc_id) + ".xml")
         id_body = file_manager.read_next_xml_file()
         for article_id, body in id_body:
-            process_article(body, int(article_id), str(file_manager._current_xml_file_index) + '.xml')
+            process_article(body, int(article_id), file_manager._current_xml_file_index)
 
 
-def process_article(content: [str], doc_id: int, filename: str):
+def process_article(content: [str], doc_id: int, file_number: int):
     """
     Reads in content, converts it to tokens and writes them to the index.
     :param content: The contents of the <bdy> tag from the XML file
     :param doc_id: The id of the XML file
-    :param filename: The filename of the XML file the article belongs to
+    :param file_number: The number of the XML file the article belongs to
     """
     tokens = text2tokens(content)
     # Construct a dict with tokens and their number of occurrences
     token_frequency = dict(Counter(tokens))
-    inverted_index.append_dict(token_frequency, doc_id, len(tokens), filename)
+    inverted_index.append_dict(token_frequency, doc_id, len(tokens), file_number)
 
 
 def remove_accents(text):
