@@ -1,7 +1,8 @@
+import os
 import pickle
 
 from bs4 import BeautifulSoup
-from iir_code.inverted_index import InvertedIndex
+from iir_code.data.inverted_index import InvertedIndex
 
 
 def id_has_parent_header_and_associated_body(tag):
@@ -17,9 +18,11 @@ def id_has_parent_header_and_associated_body(tag):
 
 class FileManager:
     _article_file_path = "../dataset/wikipedia articles/"
-    _saved_index_path = "../"
+    _topics_file_path = "../dataset/topics.xml"
+    _saved_index_path = "../dataset/index.pickle"
+    _saved_qrels_files_path = "../dataset/qrels/"
     _current_xml_file_index = 0
-    _xml_files_count = 1
+    _xml_files_count = 553
 
     def __init__(self):
         self._current_xml_file_index = 0
@@ -52,6 +55,23 @@ class FileManager:
         id_body_list = tuple(zip(article_ids, body_tags))
 
         return id_body_list
+
+    def read_topics_file(self):
+        with open(self._topics_file_path, 'r') as f:
+            data_stream = f.read()
+
+        data = BeautifulSoup(data_stream, 'lxml')
+        topic_elements = data.findAll("topic")
+
+        topics = {}
+
+        for topic in topic_elements:
+            id = topic.get('id')
+            title = topic.select('title')[0].contents[0]
+            description = topic.select('description')[0].contents[0]
+            topics.update({id: {'title': title, 'description': description}})
+
+        return topics
 
     def save_index_to_pickle(self, inverted_index: InvertedIndex):
         """
@@ -89,3 +109,11 @@ class FileManager:
         article_tag = data.find('id', text=doc_id)
         text = article_tag.parent.parent.find('bdy').text
         return text
+
+    def save_qrels_file(self, qrels_lines, function_type):
+        print('Save result as qrels file')
+        base_path = self._saved_qrels_files_path + function_type
+        with open(base_path + ".qrels", 'wb') as handle:
+            handle.write('\n'.join(qrels_lines).encode('utf-8'))
+
+        # os.rename(base_path + ".txt", base_path + ".qrels")  # Can take some seconds until file is available
