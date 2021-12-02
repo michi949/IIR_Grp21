@@ -4,11 +4,22 @@ from bs4 import BeautifulSoup
 from iir_code.inverted_index import InvertedIndex
 
 
+def id_has_parent_header_and_associated_body(tag):
+    """
+    Finds all article ids which have a corresponding bdy.
+    :param tag: A tag as found by beautifulsoup's find_all() method
+    :return: True if the tag satisfies the requirements, False otherwise
+    """
+    if tag.name == 'id' and tag.parent.name == 'header' and tag.parent.find_next_sibling('bdy') is not None:
+        return True
+    return False
+
+
 class FileManager:
     _article_file_path = "../dataset/wikipedia articles/"
     _saved_index_path = "../"
     _current_xml_file_index = 0
-    _xml_files_count = 553
+    _xml_files_count = 1
 
     def __init__(self):
         self._current_xml_file_index = 0
@@ -29,17 +40,16 @@ class FileManager:
             data_stream = f.read()
 
         data = BeautifulSoup(data_stream, 'lxml')
-        body_elements = data.findAll("bdy")
-        article_id_elements = data.select('header > id')
+
+        article_ids = data.find_all(id_has_parent_header_and_associated_body)
+        body_tags = data.find_all("bdy")
 
         # Remove the <bdy></bdy> and <id></id> tags from the elements
-        bodies_cleaned = [tag.contents[0] for tag in body_elements]
-        ids_cleaned = [tag.contents[0] for tag in article_id_elements]
+        article_ids = [tag.text for tag in article_ids]
+        body_tags = [tag.text for tag in body_tags]
 
         # Construct a list of tuples [(id, body)] with each article id and corresponding body
-        id_body_list = tuple(zip(ids_cleaned, bodies_cleaned))
-
-        # TODO [MiRe] Add description headers
+        id_body_list = tuple(zip(article_ids, body_tags))
 
         return id_body_list
 
