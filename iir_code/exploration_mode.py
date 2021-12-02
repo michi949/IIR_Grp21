@@ -60,9 +60,9 @@ def tf_idf(input_str: str, doc_id: int, index):
     score_tfidf = 0
     N = len(index.ranking_dict)
     for token in query_processed:
-        if token in index.dictionary.keys() and doc_id in index.dictionary[token].keys():
-            df_t = len(index.dictionary[token])
-            tf_td = index.dictionary[token][doc_id]
+        if token in index.dictionary.keys() and doc_id in index.dictionary[token][::2]:
+            df_t = len(index.dictionary[token]) / 2
+            tf_td = index.dictionary[token][np.where(index.dictionary[token] == doc_id) + 1]
             tfidf = np.log(1+tf_td)*np.log(N/df_t)
             score_tfidf += tfidf
     return score_tfidf
@@ -82,10 +82,10 @@ def bm25(input_str: str, doc_id: int, index, k1=1.2, b=0.75):
     N = len(index.ranking_dict)
     L_ave = np.array([int(index.ranking_dict[doc_id][0]) for doc_id in index.ranking_dict]).mean()
     for token in query_processed:
-        if token in index.dictionary.keys() and doc_id in index.dictionary[token].keys():
-            df_t = len(index.dictionary[token])
+        if token in index.dictionary.keys() and doc_id in index.dictionary[token][::2]:
+            df_t = len(index.dictionary[token]) / 2
             L_d = int(index.ranking_dict[doc_id][0])
-            tf_td = index.dictionary[token][doc_id]
+            tf_td = index.dictionary[token][np.where(index.dictionary[token] == doc_id) + 1]
             score_bm25 += np.log(N/df_t)*(((k1+1)*tf_td)/(k1*((1-b)+b*(L_d/L_ave))+tf_td))
     return score_bm25
 
