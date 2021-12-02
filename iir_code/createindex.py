@@ -38,7 +38,7 @@ punctuation = regular_punct + extra_punct
 # cachedFiles: {int: [str]} = {}
 def main():
     read_all_files()
-    file_manager.save_index_as_pickle(inverted_index)
+    file_manager.save_index_to_pickle(inverted_index)
 
 
 def read_all_files():
