@@ -2,8 +2,11 @@
 This file contains your code for the interactive exploration mode where a string can be input by a user and a ranked list of documents is returned.
 Make sure that the user can switch between TF-IDF and BM25 scoring functions.
 """
-from iir_code.services.file_manager import FileManager
-from iir_code.createindex import text2tokens
+
+# IMPORTANT: change this file when the duplicates in the postings lists are fixed
+
+from FileManager import FileManager
+from createindex import text2tokens
 import numpy as np
 
 
@@ -17,19 +20,19 @@ def main():
     
     index = read_index_from_file()
     
-    dict_scores = {}
-    
     if function_type == "TF-IDF":
-        for doc_id in index.ranking_dict.keys():
-            dict_scores[doc_id] = tf_idf(input_str, doc_id, index)
+        dict_scores = tf_idf(input_str, index)
     elif function_type == "BM25":
-        for doc_id in index.ranking_dict.keys():
-            dict_scores[doc_id] = bm25(input_str, doc_id, index)
+        dict_scores = bm25(input_str, index)
     else:
         print("No valid scoring function is selected")
         print("Default Method is TF-IDF")
-        for doc_id in index.ranking_dict.keys():
-            dict_scores[doc_id] = tf_idf(input_str, doc_id, index)
+        dict_scores = tf_idf(input_str, index)
+            
+    if len(n_docs_to_return) == 0:
+        print("No valid number of documents is selected")
+        print("Default number is 1")
+        n_docs_to_return = '1'
     
     # sort dictionary by values (scores)
     sorted_score_dict = dict(sorted(dict_scores.items(), key=lambda item: item[1], reverse=True))
@@ -49,7 +52,7 @@ def read_index_from_file():
     return file_manager.load_index_from_pickle()
 
 
-def tf_idf(input_str: str, doc_id: int, index):
+def tf_idf(input_str: str, index):
     """
     Performs the TF-IDF exploration mode
     :param input_str: The search input string
@@ -57,18 +60,21 @@ def tf_idf(input_str: str, doc_id: int, index):
     :param index: the index returned from file
     """ 
     query_processed = text2tokens(input_str)
-    score_tfidf = 0
     N = len(index.ranking_dict)
-    for token in query_processed:
-        if token in index.dictionary.keys() and doc_id in index.dictionary[token].keys():
-            df_t = len(index.dictionary[token])
-            tf_td = index.dictionary[token][doc_id]
-            tfidf = np.log(1+tf_td)*np.log(N/df_t)
-            score_tfidf += tfidf
-    return score_tfidf
+    tfidf_dict = {}
+    for doc_id in index.ranking_dict.keys():
+        score_tfidf = 0
+        for token in query_processed:
+            if token in index.dictionary.keys() and doc_id in index.dictionary[token][::2]:
+                df_t = len(index.dictionary[token]) / 2
+                tf_td = index.dictionary[token][np.where(index.dictionary[token] == doc_id)[0][0] + 1]
+                tfidf = np.log(1+tf_td)*np.log(N/df_t)
+                score_tfidf += tfidf
+        tfidf_dict[doc_id] = score_tfidf
+    return tfidf_dict
 
 
-def bm25(input_str: str, doc_id: int, index, k1=1.2, b=0.75):
+def bm25(input_str: str, index, k1=1.2, b=0.75):
     """
     Performs the BM25 exploration mode
     :param input_str: The search input string
@@ -78,16 +84,19 @@ def bm25(input_str: str, doc_id: int, index, k1=1.2, b=0.75):
     :param b: b parameter for bm25
     """
     query_processed = text2tokens(input_str)
-    score_bm25 = 0
     N = len(index.ranking_dict)
+    bm25_dict = {}
     L_ave = np.array([int(index.ranking_dict[doc_id][0]) for doc_id in index.ranking_dict]).mean()
-    for token in query_processed:
-        if token in index.dictionary.keys() and doc_id in index.dictionary[token].keys():
-            df_t = len(index.dictionary[token])
-            L_d = int(index.ranking_dict[doc_id][0])
-            tf_td = index.dictionary[token][doc_id]
-            score_bm25 += np.log(N/df_t)*(((k1+1)*tf_td)/(k1*((1-b)+b*(L_d/L_ave))+tf_td))
-    return score_bm25
+    for doc_id in index.ranking_dict.keys():
+        score_bm25 = 0
+        for token in query_processed:
+            if token in index.dictionary.keys() and doc_id in index.dictionary[token][::2]:
+                df_t = len(index.dictionary[token]) / 2
+                L_d = int(index.ranking_dict[doc_id][0])
+                tf_td = index.dictionary[token][np.where(index.dictionary[token] == doc_id)[0][0] + 1]
+                score_bm25 += np.log(N/df_t)*(((k1+1)*tf_td)/(k1*((1-b)+b*(L_d/L_ave))+tf_td))
+        bm25_dict[doc_id] = score_bm25
+    return bm25_dict
 
-# main()
+#main()
 
