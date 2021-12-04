@@ -3,13 +3,13 @@ This file contains your code to generate the evaluation files that are input to 
 """
 import subprocess
 
-from exploration_new import tf_idf, bm25, read_index_from_file
-from FileManager import FileManager
+from iir_code.exploration_mode import read_index_from_file, tf_idf, bm25
+from iir_code.services.file_manager import FileManager
 
 file_manager = FileManager()
 
 
-def main_exploration():
+def main_evaluation():
     topics = file_manager.read_topics_file()
     
     # Read the index
@@ -37,7 +37,8 @@ def perform_search(input_str: str, function_type: str, index):
     
     elif function_type == "BM25":
         dictionary = bm25(input_str, index)
-    
+
+    print("Finished search with " + function_type)
     return dictionary
 
 
@@ -48,6 +49,7 @@ def process_trec_eval(qrel_lines, function_type: str):
     Ideal result should around 0.17 for TF-IDF and 0.23 for BMF
     :return:
     """
+    print("Writing qrel file for " + function_type)
     file_manager.save_qrels_file(qrel_lines, function_type)
 
     base_path = "../dataset/eval.qrels"  # + function_type
@@ -61,6 +63,7 @@ def process_topics_query(topics: dict, function_type: str, index):
     :param function_type: The function type, could be BM25 or TF-IDF
     :param topics: The topics from the xml file
     """
+    print("Starting " + function_type)
     qrels_lines = []
     for topic, sub_dictionary in topics.items():
         results = perform_search(sub_dictionary["title"] + " " + sub_dictionary["description"], function_type, index)
@@ -75,9 +78,9 @@ def process_topics_query(topics: dict, function_type: str, index):
     process_trec_eval(qrels_lines, function_type)
 
 
-main_exploration()
-process_trec_eval(["2010003 Q0 19243417 1",
-                   "2010003 Q0 3256433 1",
-                   "2010003 Q0 275014 1",
-                   "2010003 Q0 298021 0"], "TD-IFD")
+main_evaluation()
+# process_trec_eval(["2010003 Q0 19243417 1",
+#                   "2010003 Q0 3256433 1",
+#                   "2010003 Q0 275014 1",
+#                   "2010003 Q0 298021 0"], "TD-IFD")
 
