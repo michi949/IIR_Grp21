@@ -12,9 +12,9 @@ import numpy as np
 file_manager = FileManager()
 
 
-def main():
+def main_exploration():
     input_str = input('Please enter your search input string:')
-    function_type = input('Choose your preferred scoring function (Enter TF-IDF or BM25):')
+    function_type = input('Choose your d scoring function (Enter TF-IDF or BM25):')
     n_docs_to_return = input('Choose the number of most relevant documents you wish to be returned:')
     
     index = read_index_from_file()
@@ -97,5 +97,5 @@ def bm25(input_str: str, index, k1=1.2, b=0.75):
         bm25_dict[doc_id] = score_bm25
     return bm25_dict
 
-#main()
+#main_exploration()
 

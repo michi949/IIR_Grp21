@@ -10,9 +10,11 @@ file_manager = FileManager()
 
 
 def main_evaluation():
+    print("Read topic file")
     topics = file_manager.read_topics_file()
     
     # Read the index
+    print("Read index file")
     index = read_index_from_file()
 
     # TF-IDF Exploration
@@ -38,23 +40,30 @@ def perform_search(input_str: str, function_type: str, index):
     elif function_type == "BM25":
         dictionary = bm25(input_str, index)
 
-    print("Finished search with " + function_type)
     return dictionary
 
 
-def process_trec_eval(qrel_lines, function_type: str):
+def save_qrel_file(qrel_lines, function_type: str):
     """
-    Performs the trec evaluation
-    Install trec_eval first: https://github.com/usnistgov/trec_eval or brew install trec_eval
-    Ideal result should around 0.17 for TF-IDF and 0.23 for BMF
+    Performs the save of qrel files
     :return:
     """
     print("Writing qrel file for " + function_type)
     file_manager.save_qrels_file(qrel_lines, function_type)
 
-    base_path = "../dataset/eval.qrels"  # + function_type
-    goal_path = "../retrieval_results/" + function_type.lower() + "_title_description.txt"
-    subprocess.run(["trec_eval", "-m", "map", "-m", "ndcg_cut.10", "-m", "P.10", "-m", "recall.10", base_path, goal_path])
+    process_trec_eval(function_type)
+
+
+def process_trec_eval(function_type: str):
+    """
+    Peforms
+    Install trec_eval first: https://github.com/usnistgov/trec_eval or brew install trec_eval
+    Ideal result should around 0.17 for TF-IDF and 0.23 for BMF
+    """
+    print("Trec eval for " + function_type)
+    rel_info_file = "../dataset/eval.qrels"  # + function_type
+    results_file = "../dataset/qrels/"+function_type+".qrels"
+    subprocess.run(["trec_eval", "-m", "map", "-m", "ndcg_cut.10", "-m", "P.10", "-m", "recall.10", rel_info_file, results_file])
 
 
 def process_topics_query(topics: dict, function_type: str, index):
@@ -71,16 +80,13 @@ def process_topics_query(topics: dict, function_type: str, index):
         results = dict(sorted(results.items(), key=lambda item: item[1], reverse=True))
         for result_key, result_value in list(results.items())[:100]:
             rank = list(results.keys()).index(result_key) # get rank as index
-            line = topic + " Q0 " + str(result_key )+ " " + str(rank) + " " + str(result_value) + " " + function_type
+            line = topic + " Q0 " + str(result_key) + " " + str(rank) + " " + str(result_value) + " " + function_type
             # print(line)
             qrels_lines.append(line)
 
-    process_trec_eval(qrels_lines, function_type)
+    save_qrel_file(qrels_lines, function_type)
 
 
-main_evaluation()
-# process_trec_eval(["2010003 Q0 19243417 1",
-#                   "2010003 Q0 3256433 1",
-#                   "2010003 Q0 275014 1",
-#                   "2010003 Q0 298021 0"], "TD-IFD")
-
+# main_evaluation()
+process_trec_eval("BM25")
+process_trec_eval("TF-IDF")
