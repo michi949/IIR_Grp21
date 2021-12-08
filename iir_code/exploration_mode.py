@@ -3,7 +3,6 @@ This file contains your code for the interactive exploration mode where a string
 Make sure that the user can switch between TF-IDF and BM25 scoring functions.
 """
 
-# IMPORTANT: change this file when the duplicates in the postings lists are fixed
 from iir_code.services.file_manager import FileManager
 from createindex import text2tokens
 import numpy as np
