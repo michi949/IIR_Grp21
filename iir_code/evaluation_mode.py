@@ -17,6 +17,7 @@ def main_evaluation():
     print("Read index file")
     index = read_index_from_file()
 
+    print(len(index.ranking_dict))
     # TF-IDF Exploration
     process_topics_query(topics, "TF-IDF", index)
 
@@ -76,6 +77,7 @@ def process_topics_query(topics: dict, function_type: str, index):
     qrels_lines = []
     for topic, sub_dictionary in topics.items():
         results = perform_search(sub_dictionary["title"] + " " + sub_dictionary["description"], function_type, index)
+        # results = perform_search(sub_dictionary["title"], function_type, index)
         # sort index by score values
         results = dict(sorted(results.items(), key=lambda item: item[1], reverse=True))
         for result_key, result_value in list(results.items())[:100]:
@@ -87,6 +89,4 @@ def process_topics_query(topics: dict, function_type: str, index):
     save_qrel_file(qrels_lines, function_type)
 
 
-# main_evaluation()
-process_trec_eval("BM25")
-process_trec_eval("TF-IDF")
+main_evaluation()

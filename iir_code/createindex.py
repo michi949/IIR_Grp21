@@ -106,14 +106,13 @@ def text2tokens(text: str):
 
     # tokenization
     splitted_text = re.split(" |\n", text)
-    
+
     # stop words removal
     splitted_text = [token for token in splitted_text if token not in sw_set]
 
-    # stemming 
+    # stemming
     PS = PorterStemmer()
     splitted_text = [PS.stem(token) for token in splitted_text]
 
-    # TODO Add num2word, 100 to one hundred
 
     return splitted_text
