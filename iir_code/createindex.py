@@ -1,7 +1,7 @@
 """
 This file contains your iir_code to create the inverted index. Besides implementing and using the predefined tokenization function (text2tokens), there are no restrictions in how you organize this file.
 """
-from iir_code.inverted_index import InvertedIndex
+from iir_code.data.inverted_index import InvertedIndex
 from iir_code.services.file_manager import FileManager
 import re
 from nltk.stem import PorterStemmer
@@ -38,7 +38,6 @@ punctuation = regular_punct + extra_punct
 # cachedFiles: {int: [str]} = {}
 def main():
     read_all_files()
-    print('Dumping index to disk...')
     file_manager.save_index_to_pickle(inverted_index)
 
 
@@ -48,20 +47,20 @@ def read_all_files():
         print("Read file: " + str(doc_id) + ".xml")
         id_body = file_manager.read_next_xml_file()
         for article_id, body in id_body:
-            process_article(body, int(article_id), str(file_manager._current_xml_file_index) + '.xml')
+            process_article(body, int(article_id), file_manager._current_xml_file_index)
 
 
-def process_article(content: [str], doc_id: int, filename: str):
+def process_article(content: [str], doc_id: int, file_number: int):
     """
     Reads in content, converts it to tokens and writes them to the index.
     :param content: The contents of the <bdy> tag from the XML file
     :param doc_id: The id of the XML file
-    :param filename: The filename of the XML file the article belongs to
+    :param file_number: The number of the XML file the article belongs to
     """
     tokens = text2tokens(content)
     # Construct a dict with tokens and their number of occurrences
     token_frequency = dict(Counter(tokens))
-    inverted_index.append_dict(token_frequency, doc_id, len(tokens), filename)
+    inverted_index.append_dict(token_frequency, doc_id, len(tokens), file_number)
 
 
 def remove_accents(text):
@@ -108,14 +107,11 @@ def text2tokens(text: str):
     # tokenization
     splitted_text = re.split(" |\n", text)
 
-    # stemming 
-    PS = PorterStemmer()
-    splitted_text = [PS.stem(token) for token in splitted_text]
-
     # stop words removal
     splitted_text = [token for token in splitted_text if token not in sw_set]
 
+    # stemming
+    PS = PorterStemmer()
+    splitted_text = [PS.stem(token) for token in splitted_text]
+
     return splitted_text
-
-
-main()
