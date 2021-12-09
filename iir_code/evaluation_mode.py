@@ -69,7 +69,6 @@ def process_trec_eval(function_type: str):
 
 def process_topics_query(topics: dict, function_type: str, index):
     """
-    # TODO: Check trec eval implementation
     :param function_type: The function type, could be BM25 or TF-IDF
     :param topics: The topics from the xml file
     """
@@ -90,3 +89,4 @@ def process_topics_query(topics: dict, function_type: str, index):
 
 
 main_evaluation()
+

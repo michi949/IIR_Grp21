@@ -114,5 +114,4 @@ def text2tokens(text: str):
     PS = PorterStemmer()
     splitted_text = [PS.stem(token) for token in splitted_text]
 
-
     return splitted_text
