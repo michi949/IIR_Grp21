@@ -1,8 +1,9 @@
 import gensim
+import os
 from sklearn.metrics.pairwise import cosine_similarity
 
 # wiki-news-300d-1M-subword.vec unzipped locally
-model_file = '/Users/Ary/Downloads/wiki-news-300d-1M-subword.vec'
+model_file = os.path.join('..', 'dataset', 'wiki-news-300d-1M-subword.vec')
 model = gensim.models.KeyedVectors.load_word2vec_format(model_file, binary=False, encoding='utf8')
 
 # Define pairs of words and compute cosine similarity

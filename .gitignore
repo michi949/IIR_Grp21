@@ -2,6 +2,7 @@
 /dataset
 /retrieval_results
 *.pickle
+*.vec
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
