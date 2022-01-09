@@ -1,14 +1,8 @@
 import gensim
-import os
 from sklearn.metrics.pairwise import cosine_similarity
-
-# wiki-news-300d-1M-subword.vec unzipped locally
-model_file = os.path.join('..', 'dataset', 'wiki-news-300d-1M-subword.vec')
-model = gensim.models.KeyedVectors.load_word2vec_format(model_file, binary=False, encoding='utf8')
 
 def get_model(path):
     return gensim.models.KeyedVectors.load_word2vec_format(path, binary=False, encoding='utf8')
-
 
 def warmup(model):
     """Get most similar words."""

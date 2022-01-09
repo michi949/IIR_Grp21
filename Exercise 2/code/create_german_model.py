@@ -2,7 +2,6 @@
 
 import os
 import gensim
-from gensim.models import Word2Vec
 from gensim.parsing.preprocessing import *
 
 dataset = os.path.join('..', 'dataset', 'wiki-all-shuf.txt')
@@ -28,6 +27,9 @@ def reduce_wiki_file():
    """
    Reduce the 6gb wiki dataset to given chunk size.
    """
+   if os.path.isfile(reduced_dataset):
+       return
+
    with open(dataset, "rb") as f:
        chunk = f.read(chunksize)
        f.close()
@@ -55,7 +57,6 @@ def create_german_language_model(vector_size=100, window=5, min_count=1, epochs=
                                   epochs=epochs,
                                   workers=workers)
    model.save(german_model)
-   compute_german_words()
 
 
 def compute_german_words():
@@ -68,6 +69,4 @@ def compute_german_words():
    print("Top 3 Planeten: ", model_wv.most_similar("planeten", topn=3))
    print("Top 3 Arzt: ", model_wv.most_similar("arzt", topn=3))
    print("Top 3 Winter: ", model_wv.most_similar("winter", topn=3))
-
-compute_german_words()
 

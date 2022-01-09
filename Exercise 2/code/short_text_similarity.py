@@ -6,13 +6,9 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 from scipy.stats.stats import pearsonr
 import string
-from gensim.models import KeyedVectors
-import os
 
 
 stop_words = set(stopwords.words('english'))
-model_file = os.path.join('..', 'dataset', 'wiki-news-300d-1M-subword.vec')
-model = KeyedVectors.load_word2vec_format(model_file, binary=False, encoding='utf8')
 
 def preprocessing(filename: str, stop_word_removal: bool) -> pd.DataFrame:
     """
@@ -60,10 +56,11 @@ def tfidf_vectorizer(df: pd.DataFrame) -> pd.DataFrame:
     dataframe['predicted_scores'] = predicted_scores
     return dataframe
 
-def short_vector_mean(df: pd.DataFrame) -> pd.DataFrame:
+def short_vector_mean(df: pd.DataFrame, model) -> pd.DataFrame:
     """
     Calculate the similarity score of sentences using an average of the word embeddings.
     :param df: Pandas DataFrame containing the sentences
+    :param model: Gensim model containing the word embeddings
     :return DataFrame with additional column 'predicted_scores'
     """
     predicted_scores = []
@@ -95,10 +92,11 @@ def short_vector_mean(df: pd.DataFrame) -> pd.DataFrame:
     dataframe['predicted_scores'] = predicted_scores
     return dataframe
 
-def short_vector_idf_mean(df: pd.DataFrame) -> pd.DataFrame:
+def short_vector_idf_mean(df: pd.DataFrame, model) -> pd.DataFrame:
     """
     Calculate the similarity score of sentences using an IDF scores to compute a weighted average of the word embeddings.
     :param df: Pandas DataFrame containing the sentences
+    :param model: Gensim model containing the word embeddings
     :return DataFrame with additional column 'predicted_scores'
     """
     predicted_scores = []
@@ -151,7 +149,7 @@ def evaluate(df_simple: pd.DataFrame, df_full: pd.DataFrame):
     print(f'Full preprocessing: {pearsonr(df_full.ground_truth, df_full.predicted_scores)}')
     print()
     
-if __name__ == '__main__':
+def short_text_similarity(model):
     df_0 = preprocessing('../dataset.tsv', False)
     df_1 = preprocessing('../dataset.tsv', True)
 
@@ -161,14 +159,14 @@ if __name__ == '__main__':
     print('======== TfidfVectorizer ========')
     evaluate(df_tfidf_simple, df_tfidf_full)
     
-    df_svm_simple = short_vector_mean(df_0)
-    df_svm_full = short_vector_mean(df_1)
+    df_svm_simple = short_vector_mean(df_0, model)
+    df_svm_full = short_vector_mean(df_1, model)
 
     print('======== Short Vector Mean ========')
     evaluate(df_svm_simple, df_svm_full)
     
-    df_svm_idf_simple = short_vector_idf_mean(df_0)
-    df_svm_idf_full = short_vector_idf_mean(df_1)
+    df_svm_idf_simple = short_vector_idf_mean(df_0, model)
+    df_svm_idf_full = short_vector_idf_mean(df_1, model)
 
     print('======== Short Vector IDF Weighted Mean ========')
     evaluate(df_svm_idf_simple, df_svm_idf_full)

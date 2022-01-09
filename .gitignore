@@ -1,5 +1,5 @@
 # Dataset & Results
-/dataset
+dataset
 /retrieval_results
 *.pickle
 *.vec
